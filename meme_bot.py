@@ -102,7 +102,11 @@ def send():
         if (contador % 20 == 0) and LINK:
             log("📢 Enviando post promocional")
             return tg("sendMessage", {"chat_id": CANAL, "text": f"🚀 *Te gustan los memes?*\n\nUnete!\n\n{LINK}", "parse_mode": "Markdown"})
-        h = random.sample(["#memes","#meme","#funny","#lol","#viral","#dankmemes","#humor"], 3)
+        
+        # CORRECCIÓN: Escapar los hashtags para MarkdownV2
+        h_raw = random.sample(["#memes","#meme","#funny","#lol","#viral","#dankmemes","#humor"], 3)
+        h = [esc(tag) for tag in h_raw]
+        
         c = f"🖼️ *Meme del momento*\n\n📌 {esc(m['t'])}\n👤 u/{esc(m['a'])}\n⬆️ {m['v']:,} upvotes\n📍 r/{m['s']}\n\n{' '.join(h)}"
         k = {"inline_keyboard": [[{"text":"😂","callback_data":"lol"},{"text":"❤️","callback_data":"love"},{"text":"🔥","callback_data":"fire"}],[{"text":"🔗 Ver en Reddit","url":m['p']},{"text":"📤 Compartir","url":f"https://t.me/share/url?url={m['p']}"}]]}
         log(f"📤 Enviando foto a {CANAL}...")
