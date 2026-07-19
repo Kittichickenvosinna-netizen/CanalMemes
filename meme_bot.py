@@ -101,16 +101,34 @@ def send():
     try:
         if (contador % 20 == 0) and LINK:
             log("📢 Enviando post promocional")
-            return tg("sendMessage", {"chat_id": CANAL, "text": f"🚀 *Te gustan los memes?*\n\nUnete!\n\n{LINK}", "parse_mode": "Markdown"})
+            return tg("sendMessage", {
+                "chat_id": CANAL, 
+                "text": f"🚀 Te gustan los memes?\n\nUnete!\n\n{LINK}"
+            })
         
-        # CORRECCIÓN: Escapar los hashtags para MarkdownV2
-        h_raw = random.sample(["#memes","#meme","#funny","#lol","#viral","#dankmemes","#humor"], 3)
-        h = [esc(tag) for tag in h_raw]
+        h = random.sample(["#memes","#meme","#funny","#lol","#viral","#dankmemes","#humor"], 3)
         
-        c = f"🖼️ *Meme del momento*\n\n📌 {esc(m['t'])}\n👤 u/{esc(m['a'])}\n⬆️ {m['v']:,} upvotes\n📍 r/{m['s']}\n\n{' '.join(h)}"
-        k = {"inline_keyboard": [[{"text":"😂","callback_data":"lol"},{"text":"❤️","callback_data":"love"},{"text":"🔥","callback_data":"fire"}],[{"text":"🔗 Ver en Reddit","url":m['p']},{"text":"📤 Compartir","url":f"https://t.me/share/url?url={m['p']}"}]]}
+        # Caption en TEXTO PLANO (sin MarkdownV2) = cero errores de parsing
+        c = (f"🖼️ Meme del momento\n\n"
+             f"📌 {m['t']}\n"
+             f"👤 u/{m['a']}\n"
+             f"⬆️ {m['v']:,} upvotes\n"
+             f"📍 r/{m['s']}\n\n"
+             f"{' '.join(h)}")
+        
+        k = {"inline_keyboard": [
+            [{"text":"😂","callback_data":"lol"},{"text":"❤️","callback_data":"love"},{"text":"🔥","callback_data":"fire"}],
+            [{"text":"🔗 Ver en Reddit","url":m['p']},{"text":"📤 Compartir","url":f"https://t.me/share/url?url={m['p']}"}]
+        ]}
+        
         log(f"📤 Enviando foto a {CANAL}...")
-        return tg("sendPhoto", {"chat_id": CANAL, "photo": m['u'], "caption": c, "parse_mode": "MarkdownV2", "reply_markup": k})
+        # SIN parse_mode, o sea, texto plano
+        return tg("sendPhoto", {
+            "chat_id": CANAL, 
+            "photo": m['u'], 
+            "caption": c, 
+            "reply_markup": k
+        })
     except Exception as e:
         log(f"❌ Error en send(): {e}")
         traceback.print_exc()
